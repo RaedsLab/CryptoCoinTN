@@ -44,18 +44,38 @@ $tmp = explode(" ",$str);
 //echo "[".$i."] ".$tmp[$i]."<br>";}
 
 
-// TODO : implement something to get real time US DOLLAR => TN DINAR VALUE 
+
+$url = 'http://openexchangerates.org/api/latest.json?app_id=xxxxxxxxxx';
+$data = array();
+
+$options = array(
+    'http' => array(
+        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+        'method'  => 'POST',
+        'content' => http_build_query($data),
+    ),
+);
+$context  = stream_context_create($options);
+$result = file_get_contents($url, false, $context);
+$money = json_decode($result);
+$dinar= $money->{'rates'}->{'TND'};
+
+
+$tnd= floatval($dinar);
 $btc = floatval($tmp[3]);
-$btc = ($btc*1.6034);
+
+
+
+$btc = ($btc*$tnd);
 
 $lite = floatval($tmp[6]);
-$lite = ($lite*1.6034);
+$lite = ($lite*$tnd);
 
 $peer = floatval($tmp[9]);
-$peer = ($peer*1.6034);
+$peer = ($peer*$tnd);
 
 $dog = floatval($tmp[12]);
-$dog = ($dog*1.6034);
+$dog = ($dog*$tnd);
 if($btc>=0){
 	$tweet = "#Bitcoin = ".$btc." DTN \n #Litecoin = ".$lite." DTN \n #Peercoin = ".$peer." DTN \n #Dogecoin = ".$dog." DTN";
 	$connection->post('statuses/update', array('status' => $tweet));
